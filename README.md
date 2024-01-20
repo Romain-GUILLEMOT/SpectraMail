@@ -1,4 +1,5 @@
 # SpectraMail
+## EN COURS DE DÉVELOPPEMENT
 
 SpectraMail est une application de messagerie web moderne et sécurisée, développée avec Next.js, Preact et TypeScript.
 
