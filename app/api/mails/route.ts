@@ -19,26 +19,47 @@ async function fetchEmails(imap: Imap): Promise<any> {
                 }
 
                 // Recherchez les 10 premiers emails
-                imap.search(['1:10'], async (searchError, searchResults) => {
+                imap.search(['1:100'], async (searchError, searchResults) => {
                     if (searchError) {
                         reject(searchError); // En cas d'erreur, rejet de la promesse
                         return;
                     }
 
                     const f = imap.fetch(searchResults, {
-                        bodies: 'HEADER.FIELDS (FROM TO SUBJECT DATE)',
+                        bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)', 'TEXT'],
                         struct: true
                     });
 
-                    const emails: { subject: any; from: any; date: any; }[] = [];
+                    const emails: { subject: any; id: number; from: any; date: any; body: any; }[] = [];
                     f.on('message', (msg) => {
-                        msg.on('body', (stream) => {
+                        let header: any = '';
+                        let body = '';
+                        let id: number;
+
+                        msg.on('attributes', (attrs) => {
+                            id = attrs.uid;
+                        });
+                        msg.on('body', (stream, info) => {
                             let buffer = '';
                             stream.on('data', (chunk) => {
                                 buffer += chunk.toString('utf8');
+
                             });
                             stream.on('end', () => {
-                                emails.push(parseHeader(Imap.parseHeader(buffer)));
+                                console.log(buffer);
+                                if (info.which === 'TEXT')
+                                    body = buffer;
+
+                                else
+                                    header = Imap.parseHeader(buffer);
+                            });
+                        });
+                        msg.on('end', () => {
+                            emails.push({
+                                ...parseHeader(header),
+                                id,
+                                body: body.substring(0,100) + '...'
+
                             });
                         });
                     });

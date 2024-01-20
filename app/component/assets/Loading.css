@@ -1,0 +1,22 @@
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.loader {
+    border-top-color: #3498db; /* Couleur de la bordure supérieure */
+    animation: spin 1s infinite linear; /* Animation de rotation */
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.animate-fadeOut {
+    animation: fadeOut 1s ease-out;
+}
